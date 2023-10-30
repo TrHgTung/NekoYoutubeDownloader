@@ -1,0 +1,210 @@
+<html>
+  <head>
+    <title>Công cụ download video từ Youtube</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/"><b>NEKO Project</b></a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a href="/" class="nav-link active" aria-current="page"
+                  >Ứng dụng</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  href="https://github.com/TrHgTung/YoutubeDownloader"
+                  target="_blank"
+                  class="nav-link"
+                  >Mã nguồn</a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="/huongdan" class="nav-link">Demo sử dụng</a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="https://github.com/TrHgTung/YoutubeDownloader/blob/main/README.md"
+                  target="_blank"
+                  class="nav-link"
+                  >Hướng dẫn cài đặt</a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="/huongdan" class="nav-link">Hướng dẫn sử dụng</a>
+              </li>
+              <li class="nav-item">
+                <a href="/about" class="nav-link">Giới thiệu nhóm</a>
+              </li>
+            </ul>
+            <a
+              href="https://vi.wikipedia.org/wiki/Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh"
+              target="_blank"
+              ><img
+                src="https://upload.wikimedia.org/wikipedia/vi/5/59/Logo_HCMUP.png"
+                width="100px"
+            /></a>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="mt-4 text-center mb-4">
+      <h2 class="mb-3">Công cụ tải xuống video từ Youtube</h2>
+      <p>
+        <strong>Nhóm tác giả:</strong> <i>Nhóm Neko</i> - Đồ án Công nghệ phần
+        mềm nâng cao
+      </p>
+    </div>
+    {% if error %}
+    <div class="alert alert-danger text-center mt-5 display-6">{{error}}</div>
+    {% endif %}
+    <div class="container mt-3">
+      <form action="/" method="post">
+        {% csrf_token %}
+        <div class="mb-3 mt-3">
+          
+          <label for="video_url" class="mb-3 fw-bold"
+            >Nhập link (URL) của video cần lấy về: (VD: https://youtu.be/jNQXAC9IVRw)</label
+          >
+          {{form.url}}
+        </div>
+        <div class="text-center mt-4 mb-5">
+          <button type="submit" class="btn btn-primary">Lấy video về</button>
+        </div>
+      </form>
+      <div class="container text-dark mt-3">
+        {% if isVideo %}
+        <div class="bd-example mt-5 shadow-lg">
+          <h4 class="text-center fw-bold mt-5 mb-3">Xem trước nội dung</h4>
+            <div class="card mb-3 border-light bg-transparent border-2 text-light" >
+              <div class="row g-0">
+                <div class="col-md-4 p-3">
+                  <div class="img-thumb">
+                    <img class="img-responsive" src="{{ image }}" width="%100" height="auto">
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h4 class="card-title"><small class="text-success fw-bold lead">Tiêu đề video: </small><a target="_blank" href="{{ url }}" class="text-dark">{{ title }}</a></h4>
+                    <h5 class="card-text"><small class="text-success fw-bold lead">Kênh sở hữu: </small><p class="text-secondary">{{ channel }}</p></h5>
+                    <p class="card-text"><small class="text-success fw-bold lead">Thời lượng: </small><p class="text-secondary">{{ duration }} phút</p></p>
+                    <p class="card-text"><small class="text-success fw-bold lead">Lượt xem: </small><p class="text-secondary">{{ views }}</p> <i class="fa-solid fa-eye"></i></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="container-lg text-center">
+              <small class="lead p-3"><h1>Lưu dưới dạng video</h1></small>
+            <table class="table text-light">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col" class="text-dark">Độ phân giải</th>
+                  <th scope="col" class="text-dark">Đuôi file</th>
+                  <th scope="col" class="text-dark">Dung lượng</th>
+                  <th scope="col" class="text-dark">Lưu về</th>
+                </tr>
+              </thead>
+              {% for video in streams %}
+              <tbody>
+                <tr>
+                  <td scope="row"><p class="text-secondary">{{video.resolution }} ({{video.itemFormat}})</p> </td>
+                  <td><p class="text-secondary">{{ video.extension }}</p></td>
+                  <td><p class="text-secondary">{{ video.file_size|filesizeformat }}</p></td>
+                  <td><a download href="{{video.url}}" class="btn"
+                    target="_blank" style="color: 960FF2;">Tải về PC <i
+                    class=" fa fa-download"></i></a></td>
+                </tr>
+              </tbody>
+              {% endfor %}
+            </table>
+
+            <table class="table text-light">
+                <small class="lead p-3"><h1>Lưu dưới dạng âm thanh</h1></small>
+              <thead>
+                <tr>
+                  <th scope="col" class="text-dark">Độ phân giải</th>
+                  <th scope="col" class="text-dark">Đuôi file</th>
+                  <th scope="col" class="text-dark">Dung lượng</th>
+                  <th scope="col" class="text-dark">Lưu về</th>
+                </tr>
+              </thead>
+              {% for audio in audioStreams %}
+              <tbody>
+                <tr>
+                  <td scope="row"><p class="text-secondary">{{audio.resolution }} ({{audio.itemFormat}})</p> </td>
+                  <td><p class="text-secondary">{{ audio.extension }}</p></td>
+                  <td><p class="text-secondary">{{ audio.file_size|filesizeformat }}</p></td>
+                  <td><a href="{{audio.url}}" download="" class="btn"
+                    target="_blank">Lưu về PC <i
+                    class=" fa fa-download"></i></a></td>
+                </tr>
+              </tbody>
+              {% endfor %}
+            </table>
+            </div>
+            
+        {% endif %}
+    </div>
+    </div>
+    <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Vui lòng chờ!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-primary alert-dismissible fade show" role="alert" style="font-size: medium;">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <strong>Vui lòng chờ!</strong> Đang lấy dữ liệu..
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="mt-5 text-center mb-5">
+      <h5><strong>Nhanh chóng - Đơn giản - Hiệu quả</strong></h5>
+    </div>
+
+    <div class="text-center">
+      <button
+        class="text-center btn btn-secondary"
+        onClick="printdiv();"
+      >
+        In màn hình
+      </button>
+
+      <script>
+        function printdiv() {
+          window.print();
+        }
+      </script>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+  </body>
+</html>
